@@ -73,4 +73,4 @@
     });
 </script>
 @endsection --}}
-{{-- <p>Post Page</p> --}}
+<p>Post Page</p>

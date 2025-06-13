@@ -74,3 +74,4 @@
 </script>
 @endsection --}}
 <p>Post Page</p>
+<p>New p tag</p>

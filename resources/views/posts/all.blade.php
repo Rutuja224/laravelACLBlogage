@@ -76,6 +76,5 @@
 <p>Post Page</p>
 <p>New p tag</p>
 <p>testing only push</p>
-<p>code from github
-</p>
+<p>code from github</p>
 

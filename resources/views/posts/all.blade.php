@@ -78,6 +78,4 @@
 <p>testing only push</p>
 <p>code from github
 </p>
-</p>
-<h3>Adding new header</h3>
-<h2>New testing</h2>
+

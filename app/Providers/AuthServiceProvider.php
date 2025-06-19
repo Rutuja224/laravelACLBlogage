@@ -34,7 +34,7 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('approve-post', function (User $user, Post $post) {
-            return $user->hasPermission('approve-post') && $post->user_id !== $user->id;
+            return $user->hasPermission('approve-post') && $post->user_id !==  $user->id;
         });
     }
 

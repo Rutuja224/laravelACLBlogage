@@ -46,6 +46,10 @@
     }
 </style>
 
+<div class="container m-3 d-flex align-items-end flex-column">
+    <a href="{{ url()->previous() }}" class="btn btn-back">&larr; Back</a>
+
+</div>
 <div class="blog-container">
     <h5 class="blog-author">By {{ $blog->user->name ?? 'Unknown' }}</h5>
     <hr>
@@ -53,6 +57,5 @@
     <div class="blog-content">
         {{ $blog->content }}
     </div>
-    <a href="{{ url()->previous() }}" class="btn btn-back">&larr; Back</a>
 </div>
 @endsection

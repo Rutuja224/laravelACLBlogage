@@ -14,11 +14,13 @@ class PostController extends Controller
     {
         $user = auth()->user();
 
-        $posts = Post::where('user_id', $user->id)->latest()->get();
+        $posts = Post::where('user_id', $user->id)
+                    ->orderBy('id', 'desc')
+                    ->get();
+        
+        $canApprovePendingPosts = \Gate::allows('can-approve-posts');
 
-        $canApprovePendingPosts = $user->hasPermission('approve post');
-
-        return view('posts.index', compact('posts', 'canApprovePendingPosts'));
+        return view('posts.index', compact('posts', 'user' , 'canApprovePendingPosts'));
     }
 
 
@@ -34,8 +36,10 @@ class PostController extends Controller
             'content' => 'required',
         ]);
 
+        $user = auth()->user();
+
         $post = Post::create([
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
             'title' => $request->title,
             'content' => $request->content,
         ]);
@@ -96,7 +100,7 @@ class PostController extends Controller
     {
         $posts = Post::with('user')
             ->where('status', 'approved')
-            ->orderByDesc('updated_at')
+            ->orderBy('updated_at', 'desc')
             ->get();
 
         return view('welcome', compact('posts'));
@@ -122,7 +126,7 @@ class PostController extends Controller
         }
 
         $post->status = 'approved';
-        $post->approved_by = auth()->id();
+        $post->approved_by = $user->id;
         $post->save();
 
         return response()->json(['success' => true,  'message' => 'Post approved successfully.']);

@@ -3,12 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Clean Blog</title>
+    <title>Blog</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}" />
     <link href="{{ asset('css/styles.css') }}" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
 </head>
 <body style="padding-top: 56px;">
 
@@ -19,7 +20,6 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             Menu <i class="fas fa-bars"></i>
         </button>
-
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link text-white" href="{{ url('/') }}">Home</a></li>
@@ -27,28 +27,15 @@
 
                 @auth
                     <li class="nav-item"><a class="nav-link text-white" href="{{ url('/posts') }}">Dashboard</a></li>
-
-                    @php
-                        $user = auth()->user();
-                    @endphp
-
-                    @if($user && $user->hasPermission('manage acl'))
+                    @if(auth()->user()->hasPermission('manage acl'))
                         <li class="nav-item"><a class="nav-link text-white" href="{{ url('/roles') }}">Roles</a></li>
                         <li class="nav-item"><a class="nav-link text-white" href="{{ url('/permissions') }}">Permissions</a></li>
                         <li class="nav-item"><a class="nav-link text-white" href="{{ url('/acl') }}">Assign Permissions</a></li>
                     @endif
-
-
-                    {{-- @if(auth()->user()->hasRole('admin'))
-                        <li class="nav-item"><a class="nav-link text-white" href="{{ url('/pending-posts') }}">Approve Posts</a></li>
-                    @endif --}}
-
                     <li class="nav-item d-flex align-items-center">
                         <form method="POST" action="{{ route('logout') }}" class="m-0 p-0">
                             @csrf
-                            <button type="submit" class="btn btn-link nav-link text-white" style="text-decoration: none;">
-                                Logout
-                            </button>
+                            <button type="submit" class="btn btn-link nav-link text-white" style="text-decoration: none;">Logout</button>
                         </form>
                     </li>
                 @else
@@ -61,7 +48,9 @@
 </nav>
 
 <!-- CONTENT -->
-@yield('content')
+<div class="container mt-5 pt-4">
+    @yield('content')
+</div>
 
 <!-- FOOTER -->
 <footer class="border-top mt-5 py-4 bg-light">
@@ -75,9 +64,32 @@
     </div>
 </footer>
 
-<!-- JS -->
+<!-- Loader  -->
+<div id="loaderOverlay" style="
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 9999;">
+    <div style="
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);">
+        
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @yield('scripts')
-
 </body>
 </html>

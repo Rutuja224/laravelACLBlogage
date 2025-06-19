@@ -2,7 +2,13 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2>Pending Posts for Approval</h2>
+    <div class="d-flex justify-content-between">
+
+        <h2>Pending Posts for Approval</h2>
+
+        <a href="{{ url()->previous() }}" class="btn btn-back btn-primary">Back</a>
+
+    </div>
 
     @if($pendingPosts->isEmpty())
         <p>No pending posts to approve or decline.</p>

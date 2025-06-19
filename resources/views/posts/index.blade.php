@@ -6,9 +6,10 @@
         <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createPostModal">
             + New Post
         </button>
-        @if($canApprovePendingPosts)
+
+        @can('can-approve-posts')
             <a href="{{ route('posts.pending') }}" class="btn btn-warning">View Pending Posts</a>
-        @endif
+        @endcan
     </div>
 
     <h3 class="mt-5">All Posts</h3>
@@ -45,10 +46,13 @@
                         <button class="btn btn-sm btn-danger deleteBtn" data-id="{{ $post->id }}">Delete</button>
                     @endif
 
-                    @if(auth()->user()->hasPermission('approve post') && $post->user_id !== auth()->id() && $post->status === 'pending')
-                        <button class="btn btn-sm btn-success approveBtn" data-id="{{ $post->id }}">Approve</button>
-                        <button class="btn btn-sm btn-secondary declineBtn" data-id="{{ $post->id }}">Decline</button>
-                    @endif
+                    @can('approve-post', $post)
+                      @if($post->status === 'pending')
+                          <button class="btn btn-sm btn-success approveBtn" data-id="{{ $post->id }}">Approve</button>
+                          <button class="btn btn-sm btn-secondary declineBtn" data-id="{{ $post->id }}">Decline</button>
+                      @endif
+                    @endcan
+
                 </td>
             </tr>
             @endforeach
@@ -100,8 +104,8 @@
 <div class="modal fade" id="editPostModal" tabindex="-1" aria-labelledby="editPostModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <form id="editPostForm" class="modal-content">
-      @csrf
-      @method('PUT')
+      {{-- @csrf
+      @method('PUT') --}}
       <input type="hidden" name="post_id" id="editPostId">
       <div class="modal-header">
         <h5 class="modal-title" id="editPostModalLabel">Edit Post</h5>
@@ -125,11 +129,24 @@
   </div>
 </div>
 
+
+
 <script>
 $(document).ready(function() {
     // Create post
     $('#createPostForm').submit(function(e){
         e.preventDefault();
+
+        let title = $('input[name="title"]').val().trim();
+        let content = $('textarea[name="content"]').val().trim();
+
+        if(title === '' || content === '') {
+            $('#postMsg').text('Title and Content cannot be empty.');
+            return;
+        }
+
+        $('#postMsg').text(''); 
+
         $.ajax({
             url: '/posts',
             method: 'POST',
@@ -146,6 +163,7 @@ $(document).ready(function() {
             }
         });
     });
+
 
     // Delete post
     $('.deleteBtn').click(function(){
@@ -178,35 +196,53 @@ $(document).ready(function() {
     });
 
     // Submit edit form
-    $('#editPostForm').submit(function(e){
-        e.preventDefault();
-        let postId = $('#editPostId').val();
-        let formData = {
-            '_token': '{{ csrf_token() }}',
-            '_method': 'PUT',
-            'title': $('#editPostTitle').val(),
-            'content': $('#editPostContent').val()
-        };
+$('#editPostForm').submit(function(e){
+    e.preventDefault();
 
-        $.ajax({
-            url: '/posts/' + postId,
-            method: 'POST',
-            data: formData,
-            success: function(res){
-                if(res.success){
-                    let row = $('#post-' + postId);
-                    row.find('td:eq(0)').text(formData.title);
-                    row.find('.post-content-preview').text(formData.content.split('\n').slice(0, 5).join('\n'));
-                    row.find('.read-more-toggle').data('content', formData.content);
+    let postId = $('#editPostId').val();
+    let title = $('#editPostTitle').val().trim();
+    let content = $('#editPostContent').val().trim();
+
+    if(title === '' || content === ''){
+        $('#editPostError').text('Title and content cannot be empty.');
+        return;
+    }
+
+    let formData = {
+        '_token': '{{ csrf_token() }}',
+        '_method': 'PUT',
+        'title': title,
+        'content': content
+    };
+
+    // Show loader before AJAX
+    $('#loaderOverlay').fadeIn();
+
+    $.ajax({
+        url: '/posts/' + postId,
+        method: 'POST',
+        data: formData,
+        success: function(res){
+            if(res.success){
+                setTimeout(function(){
                     $('#editPostModal').modal('hide');
-                }
-            },
-            error: function(xhr){
-                let errors = xhr.responseJSON.errors;
-                $('#editPostError').text(Object.values(errors).join(', '));
+                    $('#editPostError').text('');
+                    location.reload(); 
+                }, 2000); // 3 seconds delay
+            } else {
+                $('#editPostError').text('Something went wrong.');
+                $('#loaderOverlay').fadeOut();
             }
-        });
+        },
+        error: function(xhr){
+            let errors = xhr.responseJSON?.errors || {'error': ['Unknown error']};
+            $('#editPostError').text(Object.values(errors).join(', '));
+            $('#loaderOverlay').fadeOut();
+        }
     });
+});
+
+
 
     // Approve / Decline
     $('.approveBtn, .declineBtn').click(function(){
@@ -235,5 +271,9 @@ $(document).ready(function() {
         $(this).find('.modal-body').text(content);
     });
 });
+
+
+
+
 </script>
 @endsection

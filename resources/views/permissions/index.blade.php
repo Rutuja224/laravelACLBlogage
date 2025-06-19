@@ -1,5 +1,9 @@
 @extends('layout')
 
+@section('head')
+     <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
+@endsection
 @section('content')
 <div class="container mt-4">
     <h2>Manage Permissions</h2>
@@ -14,7 +18,7 @@
     </form>
 
     {{-- Display Permissions --}}
-    <table class="table table-bordered">
+    <table class="table table-bordered" id="permissionTable">
         <thead>
             <tr>
                 <th>#</th>
@@ -69,10 +73,28 @@
     </form>
   </div>
 </div>
+@endsection
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@section('scripts')
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
+
+
 <script>
 $(function() {
+
+    // DataTables 
+        $('#permissionTable').DataTable({
+            "pageLength": 10,
+            "columnDefs": [
+                { "orderable": false, "targets": 2 } 
+            ]
+        });
+
     // Delete permission
     $('.deleteBtn').click(function() {
         let id = $(this).data('id');

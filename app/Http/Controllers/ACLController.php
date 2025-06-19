@@ -47,7 +47,7 @@ class ACLController extends Controller
         return view('acl.index', compact('users', 'roles', 'permissions'));
     }
 
-    // Update permissions for multiple users (sync)
+    // Update permissions for multiple users 
     public function updateUserPermissions(Request $request)
     {
         $request->validate([
@@ -66,7 +66,7 @@ class ACLController extends Controller
         return back()->with('success', 'Permissions updated successfully!');
     }
 
-    // Update all role permissions in bulk (handles array of role_id => permissions names)
+   
     public function updateAllPermissions(Request $request)
     {
         $request->validate([

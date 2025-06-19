@@ -26,7 +26,7 @@ class AdminSeeder extends Seeder
         [
             'name' => 'Super Admin',
             'password' => Hash::make('password'),
-            'role_id' => $role->id,  // Now $role is defined
+            'role_id' => $role->id,  
         ]
         );
 

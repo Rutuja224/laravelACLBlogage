@@ -21,7 +21,7 @@
 
         <div id="permissionsSection" class="d-none">
             <div class="row" id="permissionCheckboxes">
-                {{-- Filled by JS --}}
+                {{-- js data --}}
             </div>
 
             <button type="submit" class="btn btn-primary mt-3">Update Permissions</button>

@@ -1,5 +1,10 @@
 @extends('layout')
 
+@section('head')
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
+@endsection
+
 @section('content')
 <div class="container mt-4">
     <h2>Manage Roles</h2>
@@ -13,8 +18,8 @@
         </div>
     </form>
 
-    {{-- Display Roles --}}
-    <table class="table table-bordered">
+    {{-- Roles --}}
+    <table class="table table-bordered" id="rolesTable">
         <thead>
             <tr>
                 <th>#</th>
@@ -31,8 +36,8 @@
                     <button class="btn btn-sm btn-warning editRoleBtn" data-id="{{ $role->id }}" data-name="{{ $role->name }}">Edit</button>
 
                     <form class="d-inline deleteRoleForm" data-id="{{ $role->id }}">
-                        @csrf
-                        @method('DELETE')
+                        {{-- @csrf
+                        @method('DELETE') --}}
                         <button class="btn btn-sm btn-danger">Delete</button>
                     </form>
                 </td>
@@ -52,8 +57,8 @@
 <div class="modal fade" id="editRoleModal" tabindex="-1" aria-labelledby="editRoleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <form id="editRoleForm">
-        @csrf
-        @method('PUT')
+        {{-- @csrf
+        @method('PUT') --}}
         <input type="hidden" id="editRoleId">
         <div class="modal-content">
             <div class="modal-header">
@@ -72,12 +77,29 @@
   </div>
 </div>
 
-<!-- Bootstrap & jQuery CDN -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+@endsection
+
+@section('scripts')
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
+    
 
 <script>
 $(document).ready(function() {
+
+    // DataTables 
+        $('#rolesTable').DataTable({
+            "pageLength": 10,
+            "columnDefs": [
+                { "orderable": false, "targets": 2 } 
+            ]
+        });
+
+
     // Open modal and set values
     $('.editRoleBtn').click(function() {
         const id = $(this).data('id');

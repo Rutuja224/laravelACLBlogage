@@ -10,27 +10,29 @@
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+    {{-- <link rel="stylesheet" href="//cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css"> --}}
+    @yield('head')
 </head>
 <body style="padding-top: 56px;">
 
 <!-- NAVBAR -->
 <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
     <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="{{ url('/') }}">Blog</a>
+        <a class="navbar-brand" href="{{ route('home') }}">Blog</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             Menu <i class="fas fa-bars"></i>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link text-white" href="{{ url('/') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="{{ route('home') }}">Home</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="#">About</a></li>
 
                 @auth
-                    <li class="nav-item"><a class="nav-link text-white" href="{{ url('/posts') }}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="{{ route('dashboard') }}">Dashboard</a></li>
                     @if(auth()->user()->hasPermission('manage acl'))
-                        <li class="nav-item"><a class="nav-link text-white" href="{{ url('/roles') }}">Roles</a></li>
-                        <li class="nav-item"><a class="nav-link text-white" href="{{ url('/permissions') }}">Permissions</a></li>
-                        <li class="nav-item"><a class="nav-link text-white" href="{{ url('/acl') }}">Assign Permissions</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="{{ route('roles.index') }}">Roles</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="{{ route('permissions.index') }}">Permissions</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="{{ route('acl.index') }}">Assign Permissions</a></li>
                     @endif
                     <li class="nav-item d-flex align-items-center">
                         <form method="POST" action="{{ route('logout') }}" class="m-0 p-0">
@@ -90,6 +92,7 @@
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 @yield('scripts')
 </body>
 </html>

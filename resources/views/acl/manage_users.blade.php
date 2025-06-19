@@ -1,5 +1,11 @@
 @extends('layout')
 
+@section('head')
+
+ <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
+
+@endsection
 @section('content')
 
 
@@ -8,7 +14,7 @@
     max-height: 400px;
     overflow-y: auto;
 }
-.fixed-table thead,
+/* .fixed-table thead,
 .fixed-table tbody tr {
     display: table;
     width: 100%;
@@ -22,22 +28,23 @@
 }
 .fixed-table tbody {
     display: block;
-    height: 500px; /* fixed height */
+    height: 500px; /* fixed height 
     overflow-y: auto;
-}
+} */
+
 </style>
 <div class="container mt-4">
     <h3 class="mb-4">Manage Users</h3>
 
     {{-- Search box with clear button --}}
-    <div class="mb-3 position-relative" style="max-width: 400px;">
+    {{-- <div class="mb-3 position-relative" style="max-width: 400px;">
         <input type="text" id="searchInput" class="form-control pe-5" placeholder="Search by name, email or role...">
         <button id="clearSearch" type="button" class="btn btn-sm btn-outline-secondary position-absolute end-0 top-0 mt-1 me-2 d-none" style="z-index: 10;">×</button>
-    </div>
+    </div> --}}
 
 
     <div class="table-responsive">
-        <table class="table table-bordered fixed-table">
+        <table class="table table-bordered" id="aclTable">
         <thead class="table-light">
             <tr>
                 <th>Name</th>
@@ -108,10 +115,31 @@
     </div>
   </div>
 </div>
+@endsection
+
+@section('scripts')
+
+    <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+        <!-- DataTables JS -->
+        <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
 
 <!-- jQuery AJAX -->
 <script>
 $(document).ready(function() {
+    // DataTables 
+        $('#aclTable').DataTable({
+            scrollY: '400px',
+            scrollCollapse: true,
+            paging: true,
+            pageLength: 10,
+            columnDefs: [
+                { orderable: false, targets: 3 } 
+            ]
+        });
+
+
     // Setup global CSRF token for all AJAX requests
     $.ajaxSetup({
         headers: {

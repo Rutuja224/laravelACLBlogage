@@ -1,5 +1,10 @@
 @extends('layout')
 
+@section('head')
+    <!-- DataTables CSS --> 
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
+@endsection
+
 @section('content')
 <div class="container mt-4">
     <div class="d-flex justify-content-between">
@@ -13,7 +18,7 @@
     @if($pendingPosts->isEmpty())
         <p>No pending posts to approve or decline.</p>
     @else
-        <table class="table mt-3">
+        <table class="table mt-3" id="pendingPostsTable">
             <thead>
                 <tr>
                     <th>Title</th>
@@ -44,10 +49,26 @@
         </table>
     @endif
 </div>
+@endsection
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@section('scripts')
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
+
 <script>
 $(function(){
+    // DataTables 
+        $('#pendingPostsTable').DataTable({
+            "pageLength": 10,
+            "columnDefs": [
+                { "orderable": false, "targets": 3 } 
+            ]
+        });
+
     $('.approveBtn').click(function(){
         let id = $(this).data('id');
         if(confirm('Approve this post?')) {

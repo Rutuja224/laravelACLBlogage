@@ -1,5 +1,10 @@
 @extends('layout')
 
+@section('head')
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
+@endsection
+
 @section('content')
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -129,151 +134,177 @@
   </div>
 </div>
 
+@endsection
 
+
+@section('scripts')
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
 
 <script>
-$(document).ready(function() {
-    // Create post
-    $('#createPostForm').submit(function(e){
+    $(document).ready(function() {
+
+        // DataTables 
+        $('#postsTable').DataTable({
+            "pageLength": 10,
+            "columnDefs": [
+                { "orderable": false, "targets": 3 } 
+            ]
+        });
+
+
+        // quora code:
+    //     $('#postsTable').DataTable({
+    //     "order": [[ 0, "desc" ]],
+    //     dom: 'Bfrtip',
+    //     buttons: [
+    //       'print'
+    //     ]
+    // });
+
+
+        // Create post
+        $('#createPostForm').submit(function(e){
+            e.preventDefault();
+
+            let title = $('input[name="title"]').val().trim();
+            let content = $('textarea[name="content"]').val().trim();
+
+            if(title === '' || content === '') {
+                $('#postMsg').text('Title and Content cannot be empty.');
+                return;
+            }
+
+            $('#postMsg').text(''); 
+
+            $.ajax({
+                url: '/posts',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function(res){
+                    if(res.success){
+                        $('#createPostModal').modal('hide');
+                        location.reload();
+                    }
+                },
+                error: function(xhr){
+                    let errors = xhr.responseJSON.errors;
+                    $('#postMsg').text(Object.values(errors).join(', '));
+                }
+            });
+        });
+
+
+        // Delete post
+        $('.deleteBtn').click(function(){
+            let postId = $(this).data('id');
+            if(confirm("Delete this post?")){
+                $.ajax({
+                    url: '/posts/' + postId,
+                    method: 'DELETE',
+                    data: {'_token': '{{ csrf_token() }}'},
+                    success: function(res){
+                        if(res.success){
+                            $('#post-' + postId).remove();
+                        }
+                    }
+                });
+            }
+        });
+
+        // Open edit modal
+        $('.editBtn').click(function(){
+            let postId = $(this).data('id');
+            let row = $('#post-' + postId);
+            let title = row.find('td:eq(0)').text().trim();
+            let content = row.find('.post-content-preview').text().trim();
+
+            $('#editPostId').val(postId);
+            $('#editPostTitle').val(title);
+            $('#editPostContent').val(content);
+            $('#editPostModal').modal('show');
+        });
+
+        // Submit edit form
+    $('#editPostForm').submit(function(e){
         e.preventDefault();
 
-        let title = $('input[name="title"]').val().trim();
-        let content = $('textarea[name="content"]').val().trim();
+        let postId = $('#editPostId').val();
+        let title = $('#editPostTitle').val().trim();
+        let content = $('#editPostContent').val().trim();
 
-        if(title === '' || content === '') {
-            $('#postMsg').text('Title and Content cannot be empty.');
+        if(title === '' || content === ''){
+            $('#editPostError').text('Title and content cannot be empty.');
             return;
         }
 
-        $('#postMsg').text(''); 
+        let formData = {
+            '_token': '{{ csrf_token() }}',
+            '_method': 'PUT',
+            'title': title,
+            'content': content
+        };
+
+        // Show loader before AJAX
+        $('#loaderOverlay').fadeIn();
 
         $.ajax({
-            url: '/posts',
+            url: '/posts/' + postId,
             method: 'POST',
-            data: $(this).serialize(),
+            data: formData,
             success: function(res){
                 if(res.success){
-                    $('#createPostModal').modal('hide');
-                    location.reload();
+                    setTimeout(function(){
+                        $('#editPostModal').modal('hide');
+                        $('#editPostError').text('');
+                        location.reload(); 
+                    }, 2000); // 3 seconds delay
+                } else {
+                    $('#editPostError').text('Something went wrong.');
+                    $('#loaderOverlay').fadeOut();
                 }
             },
             error: function(xhr){
-                let errors = xhr.responseJSON.errors;
-                $('#postMsg').text(Object.values(errors).join(', '));
+                let errors = xhr.responseJSON?.errors || {'error': ['Unknown error']};
+                $('#editPostError').text(Object.values(errors).join(', '));
+                $('#loaderOverlay').fadeOut();
             }
         });
     });
 
 
-    // Delete post
-    $('.deleteBtn').click(function(){
-        let postId = $(this).data('id');
-        if(confirm("Delete this post?")){
-            $.ajax({
-                url: '/posts/' + postId,
-                method: 'DELETE',
-                data: {'_token': '{{ csrf_token() }}'},
-                success: function(res){
+
+        // Approve / Decline
+        $('.approveBtn, .declineBtn').click(function(){
+            let postId = $(this).data('id');
+            let status = $(this).hasClass('approveBtn') ? 'approved' : 'declined';
+            let confirmMsg = status === 'approved' ? 'Approve this post?' : 'Decline this post?';
+
+            if(confirm(confirmMsg)){
+                $.post('/posts/' + postId + '/approve', {
+                    '_token': '{{ csrf_token() }}',
+                    'status': status
+                }, function(res){
                     if(res.success){
-                        $('#post-' + postId).remove();
+                        location.reload();
                     }
-                }
-            });
-        }
-    });
-
-    // Open edit modal
-    $('.editBtn').click(function(){
-        let postId = $(this).data('id');
-        let row = $('#post-' + postId);
-        let title = row.find('td:eq(0)').text().trim();
-        let content = row.find('.post-content-preview').text().trim();
-
-        $('#editPostId').val(postId);
-        $('#editPostTitle').val(title);
-        $('#editPostContent').val(content);
-        $('#editPostModal').modal('show');
-    });
-
-    // Submit edit form
-$('#editPostForm').submit(function(e){
-    e.preventDefault();
-
-    let postId = $('#editPostId').val();
-    let title = $('#editPostTitle').val().trim();
-    let content = $('#editPostContent').val().trim();
-
-    if(title === '' || content === ''){
-        $('#editPostError').text('Title and content cannot be empty.');
-        return;
-    }
-
-    let formData = {
-        '_token': '{{ csrf_token() }}',
-        '_method': 'PUT',
-        'title': title,
-        'content': content
-    };
-
-    // Show loader before AJAX
-    $('#loaderOverlay').fadeIn();
-
-    $.ajax({
-        url: '/posts/' + postId,
-        method: 'POST',
-        data: formData,
-        success: function(res){
-            if(res.success){
-                setTimeout(function(){
-                    $('#editPostModal').modal('hide');
-                    $('#editPostError').text('');
-                    location.reload(); 
-                }, 2000); // 3 seconds delay
-            } else {
-                $('#editPostError').text('Something went wrong.');
-                $('#loaderOverlay').fadeOut();
+                });
             }
-        },
-        error: function(xhr){
-            let errors = xhr.responseJSON?.errors || {'error': ['Unknown error']};
-            $('#editPostError').text(Object.values(errors).join(', '));
-            $('#loaderOverlay').fadeOut();
-        }
-    });
-});
+        });
 
-
-
-    // Approve / Decline
-    $('.approveBtn, .declineBtn').click(function(){
-        let postId = $(this).data('id');
-        let status = $(this).hasClass('approveBtn') ? 'approved' : 'declined';
-        let confirmMsg = status === 'approved' ? 'Approve this post?' : 'Decline this post?';
-
-        if(confirm(confirmMsg)){
-            $.post('/posts/' + postId + '/approve', {
-                '_token': '{{ csrf_token() }}',
-                'status': status
-            }, function(res){
-                if(res.success){
-                    location.reload();
-                }
-            });
-        }
+        // Read more modal
+        $('#readMoreModal').on('show.bs.modal', function(event) {
+            let button = $(event.relatedTarget);
+            let content = button.data('content');
+            let title = button.data('title');
+            $(this).find('.modal-title').text(title);
+            $(this).find('.modal-body').text(content);
+        });
     });
 
-    // Read more modal
-    $('#readMoreModal').on('show.bs.modal', function(event) {
-        let button = $(event.relatedTarget);
-        let content = button.data('content');
-        let title = button.data('title');
-        $(this).find('.modal-title').text(title);
-        $(this).find('.modal-body').text(content);
-    });
-});
 
-
-
-
-</script>
+    </script>
 @endsection

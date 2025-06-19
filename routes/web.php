@@ -33,12 +33,12 @@ use App\Http\Controllers\PostController;
 
 // Post routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/posts', [PostController::class, 'index']);
+    Route::get('/posts', [PostController::class, 'index'])->name('dashboard');
     Route::get('/posts/create', [PostController::class, 'create']); 
     Route::post('/posts', [PostController::class, 'store']);
     Route::put('/posts/{post}', [PostController::class, 'update']);
     Route::delete('/posts/{post}', [PostController::class, 'destroy']);
-    Route::get('/posts/all', [PostController::class, 'allPosts'])->name('posts.all');
+    // Route::get('/posts/all', [PostController::class, 'allPosts'])->name('posts.all');
 
 
 
@@ -60,6 +60,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/users/{id}', [ACLController::class, 'show'])->name('admin.users.show');
     Route::post('/admin/users/{id}', [ACLController::class, 'update'])->name('admin.users.update');
     Route::delete('/admin/users/{id}', [ACLController::class, 'destroy'])->name('admin.users.destroy');
+    Route::get('acl', [ACLController::class, 'index'])->name('acl.index');
 
     // Route::get('/admin/users', [UserController::class, 'manageUsers'])->name('admin.manageUsers');
     

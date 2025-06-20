@@ -6,7 +6,7 @@
 @endsection
 
 @section('content')
-<div class="container mt-4">
+<div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createPostModal">
             + New Post

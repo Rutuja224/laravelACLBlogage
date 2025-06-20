@@ -155,17 +155,6 @@
             ]
         });
 
-
-        // quora code:
-    //     $('#postsTable').DataTable({
-    //     "order": [[ 0, "desc" ]],
-    //     dom: 'Bfrtip',
-    //     buttons: [
-    //       'print'
-    //     ]
-    // });
-
-
         // Create post
         $('#createPostForm').submit(function(e){
             e.preventDefault();
@@ -196,7 +185,6 @@
                 }
             });
         });
-
 
         // Delete post
         $('.deleteBtn').click(function(){

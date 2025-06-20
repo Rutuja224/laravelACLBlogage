@@ -7,6 +7,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ACLController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\CommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,12 +39,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/posts', [PostController::class, 'store']);
     Route::put('/posts/{post}', [PostController::class, 'update']);
     Route::delete('/posts/{post}', [PostController::class, 'destroy']);
-    // Route::get('/posts/all', [PostController::class, 'allPosts'])->name('posts.all');
-
-
-
-
-    // Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::get('acl', [ACLController::class, 'index']);
@@ -62,7 +57,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/admin/users/{id}', [ACLController::class, 'destroy'])->name('admin.users.destroy');
     Route::get('acl', [ACLController::class, 'index'])->name('acl.index');
 
-    // Route::get('/admin/users', [UserController::class, 'manageUsers'])->name('admin.manageUsers');
+    // Comment Section:
+    Route::post('/comments', [CommentController::class,'store'])->name('comments.store');
     
 
 
